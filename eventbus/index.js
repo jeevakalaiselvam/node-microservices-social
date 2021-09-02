@@ -3,11 +3,13 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const app = express();
 const log = require("./utils/logger");
+const cors = require("cors");
 
 //Clearing Console
 console.clear();
 
 app.use(bodyParser.json());
+app.use(cors());
 
 //Handling events and forwarding them to all services
 app.post("/events", (req, res) => {
