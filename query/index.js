@@ -1,6 +1,7 @@
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const express = require("express");
+const axios = require("axios");
 const log = require("./utils/logger");
 const {
   COMMENT_UPDATED,
@@ -18,14 +19,7 @@ app.use(cors());
 //Storing Posts and Comments
 const posts = {};
 
-app.get("/posts", (req, res) => {
-  //Sending all posts when requested
-  res.send(posts);
-});
-
-app.post("/events", (req, res) => {
-  const { type, data } = req.body;
-  log()()("EVENT RECEIVED IN QUERY", [type]);
+const handleEvent = (type, data) => {
   if (type === POST_CREATED) {
     const { id, title } = data;
     posts[id] = { id, title, comments: [] };
@@ -48,10 +42,33 @@ app.post("/events", (req, res) => {
   }
 
   log()("INFO")("POSTS INFORMATION", [posts]);
+};
+
+app.get("/posts", (req, res) => {
+  res.send(posts);
+});
+
+app.post("/events", (req, res) => {
+  //Sending all posts when requested
+  const { type, data } = req.body;
+  log()()("EVENT RECEIVED IN QUERY", [type]);
+  handleEvent(type, data);
   res.send({});
 });
 
 const PORT = 4002;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   log()()("QUERY SERVICE STARTED", [`Listening on PORT ${PORT}`]);
+
+  try {
+    const res = await axios.get("http://localhost:4005/events", {});
+    console.log(res);
+
+    for (let event of res.data) {
+      console.log("Processing Event: ", event.type);
+      handleEvent(event.type, event.data);
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
 });

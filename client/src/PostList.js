@@ -32,5 +32,5 @@ export default function PostList() {
     );
   });
 
-  return <div className='d-flex flex-row'>{renderedPosts}</div>;
+  return <div className='d-flex flex-row flex-wrap'>{renderedPosts}</div>;
 }
