@@ -4,6 +4,8 @@ const app = express();
 const cors = require("cors");
 const { randomBytes } = require("crypto");
 const { json } = require("express");
+const axios = require("axios");
+const log = require("./utils/logger");
 
 //Clearing Console
 console.clear();
@@ -13,13 +15,27 @@ app.use(cors());
 
 const commentsByPostId = {};
 
+app.post("/events", (req, res) => {
+  log()()("EVENT RECEIVED IN COMMENTS", [req.body.type]);
+  res.send({});
+});
+
+//Getting comments for a post
 app.get("/posts/:id/comments", (req, res) => {
   res.send(commentsByPostId[req.params.id] || []);
-  logComments();
+  log()()("GETTING COMMENT FOR POST", [`POST_ID - ${req.params.id}`]);
 });
+
+//Adding a new comment to a post
 app.post("/posts/:id/comments", async (req, res) => {
   const commentId = randomBytes(4).toString("hex");
   const { content } = req.body;
+
+  log()()("ADDING COMMENT TO POST", [
+    `POST_ID - ${req.params.id}`,
+    `COMMENT_DATA - ${req.body} `,
+  ]);
+
   const comments = commentsByPostId[req.params.id] || [];
   comments.push({
     id: commentId,
@@ -27,6 +43,7 @@ app.post("/posts/:id/comments", async (req, res) => {
   });
   commentsByPostId[req.params.id] = comments;
 
+  log()()("SENDING EVENT TO EVENT BUS", ["COMMENT CREATED"]);
   await axios.post("http://localhost:4005/events", {
     type: "CommentCreated",
     data: {
@@ -37,16 +54,9 @@ app.post("/posts/:id/comments", async (req, res) => {
   });
 
   res.status(201).json(comments);
-  logComments();
 });
-
-const logComments = () => {
-  console.log("=================== COMMENTS ======================");
-  console.log(commentsByPostId);
-  console.log("================================================");
-};
 
 const PORT = 4001;
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+  log()("INFO")("COMMENTS SERVER STARTED", [`Listening on PORT ${PORT}`]);
 });

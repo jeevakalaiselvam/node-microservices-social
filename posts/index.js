@@ -4,6 +4,7 @@ const app = express();
 const cors = require("cors");
 const { randomBytes } = require("crypto");
 const axios = require("axios");
+const log = require("./utils/logger");
 
 //Clearing Console
 console.clear();
@@ -13,9 +14,14 @@ app.use(cors());
 
 const posts = {};
 
+app.post("/events", (req, res) => {
+  log()()("EVENT RECEIVED IN POSTS", [req.body.type]);
+  res.send({});
+});
+
 app.get("/posts", (req, res) => {
+  log()()("GETTING ALL POSTS", [posts]);
   res.json(posts);
-  logPosts();
 });
 app.post("/posts", async (req, res) => {
   const id = randomBytes(4).toString("hex");
@@ -24,7 +30,9 @@ app.post("/posts", async (req, res) => {
     id,
     title,
   };
+  log()()("ADDING NEW POST", [posts[id]]);
 
+  log()()("SENDING EVENT TO EVENT BUS", ["POST CREATED"]);
   await axios.post("http://localhost:4005/events", {
     type: "PostCreated",
     data: {
@@ -34,16 +42,9 @@ app.post("/posts", async (req, res) => {
   });
 
   res.status(201).json(posts[id]);
-  logPosts();
 });
-
-const logPosts = () => {
-  console.log("=================== POSTS ======================");
-  console.log(posts);
-  console.log("================================================");
-};
 
 const PORT = 4000;
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+  log()("INFO")("POSTS SERVER STARTED", [`Listening on PORT ${PORT}`]);
 });
