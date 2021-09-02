@@ -12,29 +12,35 @@ app.use(bodyParser.json());
 app.use(cors());
 
 //Handling events and forwarding them to all services
-app.post("/events", (req, res) => {
+app.post("/events", async (req, res) => {
   const event = req.body;
-  log()()("EVENT RECEIVED - EVENT BUS", [event]);
+  log()()("EVENT RECEIVED - EVENTBUS", [event]);
 
   //POSTS SERVICE
-  log()()("FORWARDING EVENT TO POSTS", []);
-  axios.post("http://localhost:4000/events", event).catch((error) => {
+  log()()("FORWARDING EVENT TO POSTS", [event.type]);
+  await axios.post("http://localhost:4000/events", event).catch((error) => {
     console.log(error.message);
   });
 
   //COMMENTS SERVICE
-  log()()("FORWARDING EVENT TO COMMENTS", []);
-  axios.post("http://localhost:4001/events", event).catch((error) => {
+  log()()("FORWARDING EVENT TO COMMENTS", [event.type]);
+  await axios.post("http://localhost:4001/events", event).catch((error) => {
     console.log(error.message);
   });
 
   //QUERY SERVICE
-  log()()("FORWARDING EVENT TO QUERY", []);
-  axios.post("http://localhost:4002/events", event).catch((error) => {
+  log()()("FORWARDING EVENT TO QUERY", [event.type]);
+  await axios.post("http://localhost:4002/events", event).catch((error) => {
     console.log(error.message);
   });
 
-  res.send({ status: "OK" });
+  //MODERATION SERVICE
+  log()()("FORWARDING EVENT TO MODERATION", [event.type]);
+  await axios.post("http://localhost:4003/events", event).catch((error) => {
+    console.log(error.message);
+  });
+
+  res.status(200).send({ status: "ok" });
 });
 
 //EVENT BUS RUNNING ON PORT 4005

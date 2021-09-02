@@ -5,6 +5,7 @@ const cors = require("cors");
 const { randomBytes } = require("crypto");
 const axios = require("axios");
 const log = require("./utils/logger");
+const { POST_CREATED } = require("./config/event");
 
 //Clearing Console
 console.clear();
@@ -33,16 +34,16 @@ app.post("/posts", async (req, res) => {
   };
   log()()("ADDING NEW POST", [posts[id]]);
 
-  log()()("SENDING EVENT TO EVENT BUS", ["POST CREATED"]);
+  log()()("SENDING EVENT TO EVENT BUS", [POST_CREATED]);
   await axios.post("http://localhost:4005/events", {
-    type: "PostCreated",
+    type: POST_CREATED,
     data: {
       id,
       title,
     },
   });
 
-  res.status(201).json(posts[id]);
+  res.status(201).send(posts[id]);
 });
 
 const PORT = 4000;
