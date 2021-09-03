@@ -35,7 +35,7 @@ app.post("/posts", async (req, res) => {
   log()()("ADDING NEW POST", [posts[id]]);
 
   log()()("SENDING EVENT TO EVENT BUS", [POST_CREATED]);
-  await axios.post("http://localhost:4005/events", {
+  await axios.post("http://event-bus-srv:4005/events", {
     type: POST_CREATED,
     data: {
       id,
