@@ -20,11 +20,7 @@ app.post("/events", (req, res) => {
   res.send({});
 });
 
-app.get("/posts", (req, res) => {
-  log()()("GETTING ALL POSTS", [posts]);
-  res.json(posts);
-});
-app.post("/posts", async (req, res) => {
+app.post("/posts/create", async (req, res) => {
   const id = randomBytes(4).toString("hex");
   const { title } = req.body;
 
