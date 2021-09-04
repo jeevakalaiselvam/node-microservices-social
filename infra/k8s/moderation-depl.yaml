@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: moderation
-          image: jeevakalaiselvam/moderation:0.0.4
+          image: jeevakalaiselvam/moderation:latest
 ---
 apiVersion: v1
 kind: Service

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: query
-          image: jeevakalaiselvam/query:0.0.4
+          image: jeevakalaiselvam/query:latest
 ---
 apiVersion: v1
 kind: Service
